@@ -1,11 +1,11 @@
-const {admin, db} = require('../util/admin');
+const { admin, db } = require('../util/admin');
 
 const config = require('../util/config');
 
 const firebase = require('firebase');
 firebase.initializeApp(config);
 
-const {validateSignupData, validateLoginData, reduceUserDetails} = require('../util/validators');
+const { validateSignupData, validateLoginData, reduceUserDetails } = require('../util/validators');
 
 exports.signup = (req, res) => {
   const newUser = {
@@ -15,7 +15,7 @@ exports.signup = (req, res) => {
     handle: req.body.handle
   };
 
-  const {valid, errors} = validateSignupData(newUser);
+  const { valid, errors } = validateSignupData(newUser);
 
   if (!valid) return res.status(400).json(errors);
 
@@ -52,7 +52,7 @@ exports.signup = (req, res) => {
     .catch(err => {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') return res.status(400).json({ email: 'Email is already in use' })
-      else return res.status(500).json({ error: err.code });
+      else return res.status(500).json({ general: 'Something went wrong, please try again' });
     });
 };
 
@@ -62,7 +62,7 @@ exports.login = (req, res) => {
     password: req.body.password
   };
 
-  const {valid, errors} = validateLoginData(user);
+  const { valid, errors } = validateLoginData(user);
 
   if (!valid) return res.status(400).json(errors);
 
@@ -71,12 +71,11 @@ exports.login = (req, res) => {
       return data.user.getIdToken();
     })
     .then(token => {
-      return res.json({token});
+      return res.json({ token });
     })
     .catch(err => {
       console.error(err);
-      if (err.code === 'auth/wrong-password') res.status(403).json({ general: 'Wrong credentials, please try again' })
-      else return res.status(500).json({ error: err.code });
+      res.status(403).json({ general: 'Wrong credentials, please try again' });
     });
 };
 
@@ -187,7 +186,7 @@ exports.uploadImage = (req, res) => {
     const imageExtension = filename.split('.')[filename.split('.').length - 1];
     imageFileName = `${Math.round(Math.random() * 10000000000)}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
-    imageToBeUploaded = { filepath, mimetype};
+    imageToBeUploaded = { filepath, mimetype };
 
     file.pipe(fs.createWriteStream(filepath));
   });

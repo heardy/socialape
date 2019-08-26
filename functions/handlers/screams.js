@@ -1,4 +1,4 @@
-const {db} = require('../util/admin');
+const { db } = require('../util/admin');
 
 exports.getAllScreams = (req, res) => {
   db
@@ -72,7 +72,7 @@ exports.getScream = (req, res) => {
 };
 
 exports.commentOnScream = (req, res) => {
-  if (req.body.body.trim() === '') return res.status(400).json({ message: 'Must not be empty' });
+  if (req.body.body.trim() === '') return res.status(400).json({ comment: 'Must not be empty' });
 
   const newComment = {
     body: req.body.body,
@@ -84,7 +84,7 @@ exports.commentOnScream = (req, res) => {
 
   db.doc(`/screams/${req.params.screamId}`).get()
     .then(doc => {
-      if (!doc.exists) return res.status(404).json({error: 'Scream not found'});
+      if (!doc.exists) return res.status(404).json({ error: 'Scream not found' });
 
       return doc.ref.update({ commentCount: doc.data().commentCount + 1 });
     })
@@ -171,7 +171,7 @@ exports.unlikeScream = (req, res) => {
     })
     .then(data => {
       if (data.empty) {
-        return res.status(400).json({error: 'Scream not liked'});
+        return res.status(400).json({ error: 'Scream not liked' });
       } else {
         return db
           .doc(`/likes/${data.docs[0].id}`)
